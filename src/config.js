@@ -2,6 +2,8 @@ export const API_BASE = "https://admin.jusbackend.store/api";
 export const WS_BASE = "wss://admin.jusbackend.store";
 export const ENABLE_ORDER_SOUND = true;
 export const ENABLE_ORDER_VOICE = true;
+export const ENABLE_COMPLETED_SOUND = true;
+export const ENABLE_COMPLETED_VOICE = true;
 export const ORDER_VOICE_LANGUAGE = "en-US";
 
 export function getWsCandidates(path) {

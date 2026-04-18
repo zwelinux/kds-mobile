@@ -21,7 +21,7 @@ export default function App() {
   if (booting) {
     return (
       <SafeAreaView style={tw`flex-1 items-center justify-center bg-slate-950`}>
-        <StatusBar style="light" />
+        <StatusBar style="light" hidden />
         <View style={tw`items-center`}>
           <ActivityIndicator size="large" color="#818cf8" />
         </View>
@@ -31,7 +31,7 @@ export default function App() {
 
   return (
     <SafeAreaView style={tw`flex-1 bg-slate-950`}>
-      <StatusBar style="light" />
+      <StatusBar style="light" hidden />
       {auth?.token ? (
         <KDSScreen auth={auth} onLogout={() => setAuth(null)} />
       ) : (

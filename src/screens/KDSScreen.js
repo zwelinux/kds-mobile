@@ -16,6 +16,8 @@ import { authedFetch, clearAuth } from "../lib/auth";
 import { groupTicketsIntoOrders, todayInBangkok, toDateOnly } from "../lib/kds";
 import {
   cleanStationSlug,
+  ENABLE_COMPLETED_SOUND,
+  ENABLE_COMPLETED_VOICE,
   ENABLE_ORDER_SOUND,
   ENABLE_ORDER_VOICE,
   getWsCandidates,
@@ -35,10 +37,12 @@ export default function KDSScreen({ auth, onLogout }) {
   const socketsRef = useRef({});
   const reconnectTimersRef = useRef({});
   const spokenIdsRef = useRef(new Set());
+  const completedIdsRef = useRef(new Set());
   const knownTicketIdsRef = useRef(new Set());
   const hasLoadedTicketsRef = useRef(false);
   const today = todayInBangkok();
   const orderAlertPlayer = useAudioPlayer(require("../../assets/sounds/neworder.mp3"));
+  const completedAlertPlayer = useAudioPlayer(require("../../assets/sounds/completed.mp3"));
 
   useEffect(() => {
     setAudioModeAsync({
@@ -55,6 +59,15 @@ export default function KDSScreen({ auth, onLogout }) {
     try {
       orderAlertPlayer.seekTo(0);
       orderAlertPlayer.play();
+    } catch {}
+  }
+
+  function playCompletedSound() {
+    if (!ENABLE_COMPLETED_SOUND) return;
+
+    try {
+      completedAlertPlayer.seekTo(0);
+      completedAlertPlayer.play();
     } catch {}
   }
 
@@ -85,6 +98,32 @@ export default function KDSScreen({ auth, onLogout }) {
   async function triggerOrderAlert(ticket) {
     playOrderSound();
     await speakNewOrder(ticket);
+  }
+
+  async function speakCompletedOrder(ticket) {
+    if (!ENABLE_COMPLETED_VOICE) return;
+
+    const key = `done-${ticket.id}`;
+    if (completedIdsRef.current.has(key)) return;
+    completedIdsRef.current.add(key);
+
+    const table = ticket.table_name || "Takeaway";
+    const order = ticket.order_number || ticket.order_id || "";
+    const message = `Order completed for ${table}. Order ${order}.`;
+
+    try {
+      await Speech.stop();
+      Speech.speak(message, {
+        language: ORDER_VOICE_LANGUAGE,
+        pitch: 1,
+        rate: 0.95,
+      });
+    } catch {}
+  }
+
+  async function triggerCompletedAlert(ticket) {
+    playCompletedSound();
+    await speakCompletedOrder(ticket);
   }
 
   async function loadStations() {
@@ -193,6 +232,9 @@ export default function KDSScreen({ auth, onLogout }) {
 
         if (msg.type === "update") {
           setTickets((prev) => prev.map((ticket) => (ticket.id === msg.data.id ? { ...ticket, ...msg.data } : ticket)));
+          if (msg.data.status === "done") {
+            await triggerCompletedAlert(msg.data);
+          }
           return;
         }
 
@@ -248,7 +290,7 @@ export default function KDSScreen({ auth, onLogout }) {
 
   const groupedOrders = useMemo(() => groupTicketsIntoOrders(visibleTickets), [visibleTickets]);
   const isLandscape = width > height;
-  const numColumns = isLandscape ? 3 : 2;
+  const numColumns = isLandscape ? 3 : width >= 700 ? 3 : 2;
 
   const gridData = useMemo(() => {
     const rows = [];
@@ -260,10 +302,14 @@ export default function KDSScreen({ auth, onLogout }) {
 
   async function markDone(ticketIds) {
     const ids = Array.isArray(ticketIds) ? ticketIds : [ticketIds];
+    const completedTicket = tickets.find((ticket) => ids.includes(ticket.id));
     setBusyIds((current) => [...current, ...ids]);
     setTickets((prev) =>
       prev.map((ticket) => (ids.includes(ticket.id) ? { ...ticket, status: "done", done_at: new Date().toISOString() } : ticket))
     );
+    if (completedTicket) {
+      await triggerCompletedAlert({ ...completedTicket, status: "done" });
+    }
 
     try {
       await Promise.all(

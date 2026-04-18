@@ -1,9 +1,19 @@
+import { useEffect, useState } from "react";
 import { Pressable, Text, View } from "react-native";
 import { groupModifierLines, prettyAge } from "../lib/kds";
 import tw from "../lib/tw";
 
 export default function OrderCard({ group, busy, onDone }) {
   const isDone = group.activeCount === 0;
+  const [, setTick] = useState(0);
+
+  useEffect(() => {
+    const timer = setInterval(() => {
+      setTick((value) => value + 1);
+    }, 1000);
+
+    return () => clearInterval(timer);
+  }, []);
 
   return (
     <View style={tw`mb-4 overflow-hidden rounded-[28px] border border-slate-800 bg-slate-900`}>
@@ -14,7 +24,7 @@ export default function OrderCard({ group, busy, onDone }) {
             Order {group.orderNumber}
           </Text>
         </View>
-        <Text style={tw`text-sm font-black text-white`}>{prettyAge(group.createdAt)}</Text>
+        <Text style={tw`text-sm font-black text-white`}>{prettyAge(group.createdAt, isDone ? group.completedAt : null)}</Text>
       </View>
 
       <View style={tw`px-4 py-4`}>
