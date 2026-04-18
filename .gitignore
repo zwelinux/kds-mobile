@@ -1,0 +1,7 @@
+.expo
+.expo/
+node_modules/
+dist/
+web-build/
+.DS_Store
+

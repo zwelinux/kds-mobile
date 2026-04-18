@@ -1,0 +1,36 @@
+{
+  "expo": {
+    "name": "JusPOS KDS",
+    "slug": "juspos-kds-mobile",
+    "version": "0.1.0",
+    "orientation": "portrait",
+    "userInterfaceStyle": "light",
+    "icon": "./assets/branding/icon.png",
+    "assetBundlePatterns": [
+      "**/*"
+    ],
+    "splash": {
+      "image": "./assets/branding/splash-icon.png",
+      "resizeMode": "contain",
+      "backgroundColor": "#0f172a"
+    },
+    "android": {
+      "package": "com.juspos.kds",
+      "adaptiveIcon": {
+        "foregroundImage": "./assets/branding/adaptive-icon.png",
+        "backgroundColor": "#0f172a"
+      }
+    },
+    "ios": {
+      "bundleIdentifier": "com.juspos.kds"
+    },
+    "plugins": [
+      "expo-asset"
+    ],
+    "extra": {
+      "eas": {
+        "projectId": "9653d9a4-b0ab-489b-8117-15ebab1e4e58"
+      }
+    }
+  }
+}
