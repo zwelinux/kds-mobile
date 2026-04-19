@@ -1,9 +1,11 @@
 import { useState } from "react";
 import { ActivityIndicator, Pressable, Text, TextInput, View } from "react-native";
+import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { loginWithPassword } from "../lib/auth";
 import tw from "../lib/tw";
 
 export default function LoginScreen({ onLogin }) {
+  const insets = useSafeAreaInsets();
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
   const [busy, setBusy] = useState(false);
@@ -24,8 +26,8 @@ export default function LoginScreen({ onLogin }) {
   }
 
   return (
-    <View style={tw`flex-1 bg-slate-950 px-6 py-10`}>
-      <View style={tw`mt-12 rounded-[32px] border border-slate-800 bg-slate-900 p-6`}>
+    <View style={[tw`flex-1 bg-slate-950 px-6 pb-10`, { paddingTop: Math.max(insets.top, 16) + 24 }]}>
+      <View style={tw`rounded-[32px] border border-slate-800 bg-slate-900 p-6`}>
         <Text style={tw`text-[11px] font-black uppercase tracking-[3px] text-indigo-300`}>KDS Mobile</Text>
         <Text style={tw`mt-3 text-4xl font-black tracking-tight text-white`}>Kitchen Login</Text>
         <Text style={tw`mt-3 text-sm font-medium leading-6 text-slate-400`}>

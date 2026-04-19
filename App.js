@@ -1,6 +1,7 @@
 import { StatusBar } from "expo-status-bar";
 import { useEffect, useState } from "react";
-import { ActivityIndicator, SafeAreaView, View } from "react-native";
+import { ActivityIndicator, View } from "react-native";
+import { SafeAreaProvider, SafeAreaView } from "react-native-safe-area-context";
 import { getStoredAuth } from "./src/lib/auth";
 import LoginScreen from "./src/screens/LoginScreen";
 import KDSScreen from "./src/screens/KDSScreen";
@@ -20,23 +21,27 @@ export default function App() {
 
   if (booting) {
     return (
-      <SafeAreaView style={tw`flex-1 items-center justify-center bg-slate-950`}>
-        <StatusBar style="light" hidden />
-        <View style={tw`items-center`}>
-          <ActivityIndicator size="large" color="#818cf8" />
-        </View>
-      </SafeAreaView>
+      <SafeAreaProvider>
+        <SafeAreaView edges={["top", "bottom"]} style={tw`flex-1 items-center justify-center bg-slate-950`}>
+          <StatusBar style="light" translucent backgroundColor="transparent" />
+          <View style={tw`items-center`}>
+            <ActivityIndicator size="large" color="#818cf8" />
+          </View>
+        </SafeAreaView>
+      </SafeAreaProvider>
     );
   }
 
   return (
-    <SafeAreaView style={tw`flex-1 bg-slate-950`}>
-      <StatusBar style="light" hidden />
-      {auth?.token ? (
-        <KDSScreen auth={auth} onLogout={() => setAuth(null)} />
-      ) : (
-        <LoginScreen onLogin={setAuth} />
-      )}
-    </SafeAreaView>
+    <SafeAreaProvider>
+      <SafeAreaView edges={["top", "bottom"]} style={tw`flex-1 bg-slate-950`}>
+        <StatusBar style="light" translucent backgroundColor="transparent" />
+        {auth?.token ? (
+          <KDSScreen auth={auth} onLogout={() => setAuth(null)} />
+        ) : (
+          <LoginScreen onLogin={setAuth} />
+        )}
+      </SafeAreaView>
+    </SafeAreaProvider>
   );
 }

@@ -33,7 +33,7 @@ export default function OrderCard({ group, busy, onDone }) {
             <View style={tw`flex-row items-start justify-between`}>
               <View style={tw`flex-1 pr-3`}>
                 <Text style={tw`text-base font-black leading-tight text-white`}>
-                  {item.qty}x {item.productName}
+                  {item.productName} x {item.qty}
                 </Text>
                 {item.variantName ? (
                   <Text style={tw`mt-1 text-[11px] font-bold uppercase tracking-[2px] text-indigo-300`}>

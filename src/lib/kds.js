@@ -138,6 +138,6 @@ export function groupTicketsIntoOrders(tickets) {
         completedAt,
       };
     })
-    .filter((group) => group.items.length > 0)
+    .filter((group) => group.items.length > 0 && group.activeCount > 0)
     .sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt));
 }

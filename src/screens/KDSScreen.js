@@ -11,6 +11,7 @@ import {
 } from "react-native";
 import { setAudioModeAsync, useAudioPlayer } from "expo-audio";
 import * as Speech from "expo-speech";
+import { useSafeAreaInsets } from "react-native-safe-area-context";
 import OrderCard from "../components/OrderCard";
 import { authedFetch, clearAuth } from "../lib/auth";
 import { groupTicketsIntoOrders, todayInBangkok, toDateOnly } from "../lib/kds";
@@ -27,6 +28,7 @@ import tw from "../lib/tw";
 
 export default function KDSScreen({ auth, onLogout }) {
   const { width, height } = useWindowDimensions();
+  const insets = useSafeAreaInsets();
   const [tickets, setTickets] = useState([]);
   const [stations, setStations] = useState([{ slug: "ALL", name: "ALL" }]);
   const [selectedStation, setSelectedStation] = useState("ALL");
@@ -78,12 +80,8 @@ export default function KDSScreen({ auth, onLogout }) {
     if (spokenIdsRef.current.has(key)) return;
     spokenIdsRef.current.add(key);
 
-    const qty = Number(ticket.qty || 1);
     const table = ticket.table_name || "Takeaway";
-    const item = ticket.product_name || "item";
-    const order = ticket.order_number || ticket.order_id || "";
-    const quantityText = qty > 1 ? `${qty} ${item}` : item;
-    const message = `New order for ${table}. ${quantityText}. Order ${order}.`;
+    const message = `New order for ${table}.`;
 
     try {
       await Speech.stop();
@@ -108,8 +106,7 @@ export default function KDSScreen({ auth, onLogout }) {
     completedIdsRef.current.add(key);
 
     const table = ticket.table_name || "Takeaway";
-    const order = ticket.order_number || ticket.order_id || "";
-    const message = `Order completed for ${table}. Order ${order}.`;
+    const message = `Order completed for ${table}.`;
 
     try {
       await Speech.stop();
@@ -332,7 +329,7 @@ export default function KDSScreen({ auth, onLogout }) {
 
   return (
     <View style={tw`flex-1 bg-slate-950`}>
-      <View style={tw`border-b border-slate-800 bg-slate-900 px-5 py-4`}>
+      <View style={[tw`border-b border-slate-800 bg-slate-900 px-5 pb-4`, { paddingTop: Math.max(insets.top, 8) + 8 }]}>
         <View style={tw`flex-row items-center justify-between`}>
           <View style={tw`flex-1 pr-3`}>
             <Text style={tw`text-[11px] font-black uppercase tracking-[3px] text-indigo-300`}>KDS Mobile</Text>
